@@ -13,14 +13,15 @@ export async function generateStaticParams() {
 
 interface LangLayoutProps {
   children: ReactNode;
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }
 
-export default function LangLayout({ children, params }: LangLayoutProps) {
-  if (!isLanguage(params.lang)) {
+export default async function LangLayout({ children, params }: LangLayoutProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   const dictionary = getDictionary(lang);
 
   return (

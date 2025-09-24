@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
 
+export const runtime = "nodejs";
+
 type ContactPayload = {
   name: string;
   email: string;
@@ -65,7 +67,9 @@ export async function POST(request: Request) {
     }
 
     const transporter = nodemailer.createTransport({
-      service: "gmail",
+      host: "smtp.gmail.com",
+      port: 465,
+      secure: true,
       auth: {
         user: process.env.GMAIL_USER,
         pass: process.env.GMAIL_APP_PASSWORD,
@@ -83,6 +87,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Message sent" }, { status: 200 });
   } catch (error) {
     console.error("Contact form error", error);
-    return NextResponse.json({ message: "Unable to send message" }, { status: 500 });
+    const message =
+      error instanceof Error ? error.message : typeof error === "string" ? error : "Unknown error";
+    return NextResponse.json({ message: "Unable to send message", error: message }, { status: 500 });
   }
 }
