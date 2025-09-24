@@ -17,11 +17,20 @@ const SUCCESS_MESSAGES: Record<Language, string> = {
   es: "¡Gracias! Te contactaremos muy pronto.",
 };
 
+type DebugInfo = Record<string, unknown>;
+function getMessage(obj: unknown): string | undefined {
+  if (obj && typeof obj === "object" && "message" in obj) {
+    const m = (obj as { message?: unknown }).message;
+    if (typeof m === "string") return m;
+  }
+  return undefined;
+}
+
 export function ContactForm({ dictionary, lang }: ContactFormProps) {
   const { formLabels } = dictionary.contact;
   const [status, setStatus] = useState<FormState>("idle");
   const [error, setError] = useState<string | null>(null);
-  const [debugData, setDebugData] = useState<any | null>(null);
+  const [debugData, setDebugData] = useState<Record<string, unknown> | null>(null);
   const DEBUG = process.env.NEXT_PUBLIC_CONTACT_DEBUG === "true";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -41,18 +50,33 @@ export function ContactForm({ dictionary, lang }: ContactFormProps) {
         body: JSON.stringify({ ...data, debug: DEBUG }),
       });
 
-      const debugBody = DEBUG ? await response.clone().json().catch(() => null) : null;
+      const debugBody: unknown = DEBUG ? await response.clone().json().catch(() => null) : null;
 
       if (!response.ok) {
-        const body = (await response.json().catch(() => ({}))) as any;
-        setError(body.message ?? "Something went wrong. Please try again.");
-        if (DEBUG) setDebugData(debugBody?.debug ?? debugBody ?? body ?? { status: response.status });
+        const body: unknown = await response.json().catch(() => ({}));
+        const message = getMessage(body) ?? "Something went wrong. Please try again.";
+        setError(message);
+        if (DEBUG) {
+          const errDebug =
+            debugBody && typeof debugBody === "object"
+              ? (debugBody as DebugInfo)
+              : body && typeof body === "object"
+              ? (body as DebugInfo)
+              : ({ status: response.status } as DebugInfo);
+          setDebugData(errDebug);
+        }
         setStatus("error");
         return;
       }
 
       form.reset();
-      if (DEBUG) setDebugData(debugBody?.debug ?? debugBody ?? { status: response.status });
+      if (DEBUG) {
+        const okDebug =
+          debugBody && typeof debugBody === "object"
+            ? (debugBody as DebugInfo)
+            : ({ status: response.status } as DebugInfo);
+        setDebugData(okDebug);
+      }
       setStatus("success");
     } catch (err) {
       console.error(err);
