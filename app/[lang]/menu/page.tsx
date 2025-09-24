@@ -21,11 +21,12 @@ const metaCopy: Record<Language, { title: string; description: string }> = {
   },
 };
 
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   return {
     title: metaCopy[lang].title,
     description: metaCopy[lang].description,
@@ -40,14 +41,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
 }
 
 interface MenuPageProps {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }
 
-export default function MenuPage({ params }: MenuPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function MenuPage({ params }: MenuPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   const dictionary = getDictionary(lang);
 
   const sections = lang === "en" ? MENU_SECTIONS.en : MENU_SECTIONS.es;

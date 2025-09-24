@@ -37,13 +37,14 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: string; service: string };
+  params: Promise<{ lang: string; service: string }>;
 }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const serviceId = serviceSlugToId[lang][params.service];
+  const lang = resolvedParams.lang as Language;
+  const serviceId = serviceSlugToId[lang][resolvedParams.service];
   if (!serviceId) {
     notFound();
   }
@@ -68,15 +69,16 @@ export async function generateMetadata({
 }
 
 interface ServicePageProps {
-  params: { lang: string; service: string };
+  params: Promise<{ lang: string; service: string }>;
 }
 
-export default function ServicePage({ params }: ServicePageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function ServicePage({ params }: ServicePageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const service = findServiceBySlug(lang, params.service);
+  const lang = resolvedParams.lang as Language;
+  const service = findServiceBySlug(lang, resolvedParams.service);
   if (!service) {
     notFound();
   }

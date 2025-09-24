@@ -21,11 +21,12 @@ const servicesMeta: Record<Language, { title: string; description: string }> = {
   },
 };
 
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   return {
     title: servicesMeta[lang].title,
     description: servicesMeta[lang].description,
@@ -40,14 +41,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
 }
 
 interface ServicesPageProps {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }
 
-export default function ServicesPage({ params }: ServicesPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function ServicesPage({ params }: ServicesPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   const dictionary = getDictionary(lang);
 
   const introCopy =
