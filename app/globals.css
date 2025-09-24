@@ -1,0 +1,35 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+  background-color: #f9f4ec;
+  color: #3b2210;
+}
+
+body {
+  @apply bg-cream text-coffee font-body antialiased;
+}
+
+a {
+  @apply text-teal transition-colors duration-200;
+}
+
+a:hover {
+  @apply text-coffee;
+}
+
+button:focus-visible,
+ a:focus-visible,
+ input:focus-visible,
+ textarea:focus-visible,
+ select:focus-visible {
+  @apply outline-none ring-2 ring-teal ring-offset-2 ring-offset-cream;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
