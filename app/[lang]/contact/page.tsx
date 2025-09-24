@@ -22,11 +22,12 @@ const pageMeta: Record<Language, { title: string; description: string }> = {
   },
 };
 
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   return {
     title: pageMeta[lang].title,
     description: pageMeta[lang].description,
@@ -41,14 +42,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
 }
 
 interface ContactPageProps {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }
 
-export default function ContactPage({ params }: ContactPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function ContactPage({ params }: ContactPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   const dictionary = getDictionary(lang);
 
   const contactStructuredData = JSON.stringify({
