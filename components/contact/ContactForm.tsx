@@ -21,6 +21,8 @@ export function ContactForm({ dictionary, lang }: ContactFormProps) {
   const { formLabels } = dictionary.contact;
   const [status, setStatus] = useState<FormState>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [debugData, setDebugData] = useState<any | null>(null);
+  const DEBUG = process.env.NEXT_PUBLIC_CONTACT_DEBUG === "true";
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -36,17 +38,21 @@ export function ContactForm({ dictionary, lang }: ContactFormProps) {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify({ ...data, debug: DEBUG }),
       });
 
+      const debugBody = DEBUG ? await response.clone().json().catch(() => null) : null;
+
       if (!response.ok) {
-        const body = await response.json().catch(() => ({}));
+        const body = (await response.json().catch(() => ({}))) as any;
         setError(body.message ?? "Something went wrong. Please try again.");
+        if (DEBUG) setDebugData(debugBody?.debug ?? debugBody ?? body ?? { status: response.status });
         setStatus("error");
         return;
       }
 
       form.reset();
+      if (DEBUG) setDebugData(debugBody?.debug ?? debugBody ?? { status: response.status });
       setStatus("success");
     } catch (err) {
       console.error(err);
@@ -159,6 +165,11 @@ export function ContactForm({ dictionary, lang }: ContactFormProps) {
           </p>
         ) : null}
       </div>
+      {DEBUG && debugData ? (
+        <pre className="whitespace-pre-wrap rounded-xl bg-cream/70 p-3 text-xs text-mocha/80 border border-latte/40">
+          {JSON.stringify(debugData, null, 2)}
+        </pre>
+      ) : null}
     </form>
   );
 }
