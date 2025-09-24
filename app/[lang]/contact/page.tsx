@@ -71,10 +71,12 @@ export default async function ContactPage({ params }: ContactPageProps) {
         description={dictionary.contact.heroDescription}
       />
 
-      <div className="grid gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-        <ContactForm dictionary={dictionary} lang={lang} />
+      <div className="grid gap-10 lg:grid-cols-3">
+        <div className="lg:col-span-2">
+          <ContactForm dictionary={dictionary} lang={lang} />
+        </div>
 
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-24">
           <Card
             title={contactDetails.businessName}
             description={
