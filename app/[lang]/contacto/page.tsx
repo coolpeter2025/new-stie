@@ -1,1 +1,2 @@
-export { revalidate, generateMetadata, default } from "../contact/page";
+export const revalidate = 86400;
+export { generateMetadata, default } from "../contact/page";
