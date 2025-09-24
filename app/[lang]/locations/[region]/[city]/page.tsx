@@ -39,14 +39,15 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: string; region: string; city: string };
+  params: Promise<{ lang: string; region: string; city: string }>;
 }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const city = getCityBySlug(lang, params.city);
-  const region = getRegionBySlug(lang, params.region);
+  const lang = resolvedParams.lang as Language;
+  const city = getCityBySlug(lang, resolvedParams.city);
+  const region = getRegionBySlug(lang, resolvedParams.region);
   if (!city || !region || city.regionId !== region.id) {
     notFound();
   }
@@ -64,16 +65,17 @@ export async function generateMetadata({
 }
 
 interface CityPageProps {
-  params: { lang: string; region: string; city: string };
+  params: Promise<{ lang: string; region: string; city: string }>;
 }
 
-export default function CityPage({ params }: CityPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function CityPage({ params }: CityPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const city = getCityBySlug(lang, params.city);
-  const region = getRegionBySlug(lang, params.region);
+  const lang = resolvedParams.lang as Language;
+  const city = getCityBySlug(lang, resolvedParams.city);
+  const region = getRegionBySlug(lang, resolvedParams.region);
   if (!city || !region || city.regionId !== region.id) {
     notFound();
   }

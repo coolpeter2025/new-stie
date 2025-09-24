@@ -29,13 +29,14 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: string; region: string };
+  params: Promise<{ lang: string; region: string }>;
 }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const region = getRegionBySlug(lang, params.region);
+  const lang = resolvedParams.lang as Language;
+  const region = getRegionBySlug(lang, resolvedParams.region);
   if (!region) {
     notFound();
   }
@@ -53,15 +54,16 @@ export async function generateMetadata({
 }
 
 interface RegionPageProps {
-  params: { lang: string; region: string };
+  params: Promise<{ lang: string; region: string }>;
 }
 
-export default function RegionPage({ params }: RegionPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function RegionPage({ params }: RegionPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const region = getRegionBySlug(lang, params.region);
+  const lang = resolvedParams.lang as Language;
+  const region = getRegionBySlug(lang, resolvedParams.region);
   if (!region) {
     notFound();
   }
