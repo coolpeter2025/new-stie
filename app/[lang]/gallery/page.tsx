@@ -17,11 +17,12 @@ const galleryItems = [
   { src: "/images/gallery-tournament.webp", alt: "Sports tournament coffee cart" },
 ];
 
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   const baseTitle = lang === "en" ? "Gallery" : "Galería";
   const baseDescription =
     lang === "en"
@@ -41,14 +42,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
 }
 
 interface GalleryPageProps {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }
 
-export default function GalleryPage({ params }: GalleryPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function GalleryPage({ params }: GalleryPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   const dictionary = getDictionary(lang);
 
   return (
