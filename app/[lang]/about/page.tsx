@@ -21,11 +21,12 @@ const metaByLanguage: Record<Language, { title: string; description: string }> =
   },
 };
 
-export async function generateMetadata({ params }: { params: { lang: string } }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+export async function generateMetadata({ params }: { params: Promise<{ lang: string }> }): Promise<Metadata> {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
   return {
     title: metaByLanguage[lang].title,
     description: metaByLanguage[lang].description,
@@ -40,14 +41,15 @@ export async function generateMetadata({ params }: { params: { lang: string } })
 }
 
 interface AboutPageProps {
-  params: { lang: string };
+  params: Promise<{ lang: string }>;
 }
 
-export default function AboutPage({ params }: AboutPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function AboutPage({ params }: AboutPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
+  const lang = resolvedParams.lang as Language;
 
   const story =
     lang === "en"
