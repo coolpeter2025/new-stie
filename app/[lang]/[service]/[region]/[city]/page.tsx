@@ -46,15 +46,16 @@ export function generateStaticParams() {
 export async function generateMetadata({
   params,
 }: {
-  params: { lang: string; service: string; region: string; city: string };
+  params: Promise<{ lang: string; service: string; region: string; city: string }>;
 }): Promise<Metadata> {
-  if (!isLanguage(params.lang)) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const service = findServiceBySlug(lang, params.service);
-  const region = getRegionBySlug(lang, params.region);
-  const city = getCityBySlug(lang, params.city);
+  const lang = resolvedParams.lang as Language;
+  const service = findServiceBySlug(lang, resolvedParams.service);
+  const region = getRegionBySlug(lang, resolvedParams.region);
+  const city = getCityBySlug(lang, resolvedParams.city);
   if (!service || !region || !city || city.regionId !== region.id) {
     notFound();
   }
@@ -81,17 +82,18 @@ export async function generateMetadata({
 }
 
 interface ServiceCityPageProps {
-  params: { lang: string; service: string; region: string; city: string };
+  params: Promise<{ lang: string; service: string; region: string; city: string }>;
 }
 
-export default function ServiceCityPage({ params }: ServiceCityPageProps) {
-  if (!isLanguage(params.lang)) {
+export default async function ServiceCityPage({ params }: ServiceCityPageProps) {
+  const resolvedParams = await params;
+  if (!isLanguage(resolvedParams.lang)) {
     notFound();
   }
-  const lang = params.lang as Language;
-  const service = findServiceBySlug(lang, params.service);
-  const region = getRegionBySlug(lang, params.region);
-  const city = getCityBySlug(lang, params.city);
+  const lang = resolvedParams.lang as Language;
+  const service = findServiceBySlug(lang, resolvedParams.service);
+  const region = getRegionBySlug(lang, resolvedParams.region);
+  const city = getCityBySlug(lang, resolvedParams.city);
   if (!service || !region || !city || city.regionId !== region.id) {
     notFound();
   }
