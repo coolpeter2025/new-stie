@@ -55,6 +55,22 @@ export default async function MenuPage({ params }: MenuPageProps) {
   const sections = lang === "en" ? MENU_SECTIONS.en : MENU_SECTIONS.es;
   const description = signatureDescriptions[lang];
 
+  // Build a single "All drinks" tile with unique items across all sections
+  const allDrinksSet = new Set<string>();
+  for (const sec of sections) {
+    for (const item of sec.items) {
+      allDrinksSet.add(item);
+    }
+  }
+  const allDrinksTile = [
+    {
+      title: lang === "en" ? "All drinks" : "Todas las bebidas",
+      items: Array.from(allDrinksSet).sort((a, b) =>
+        a.localeCompare(b, lang === "es" ? "es" : "en", { sensitivity: "base" })
+      ),
+    },
+  ];
+
 
   return (
     <section className="space-y-10">
@@ -63,7 +79,7 @@ export default async function MenuPage({ params }: MenuPageProps) {
         title={metaCopy[lang].title}
         description={description}
       />
-      <MenuGrid items={sections} />
+      <MenuGrid items={allDrinksTile} />
     </section>
   );
 }
