@@ -55,36 +55,6 @@ export default async function MenuPage({ params }: MenuPageProps) {
   const sections = lang === "en" ? MENU_SECTIONS.en : MENU_SECTIONS.es;
   const description = signatureDescriptions[lang];
 
-  const addOnCards =
-    lang === "en"
-      ? [
-          {
-            title: "Signature syrups",
-            description: "Brown butter toffee, brûléed sugar, orange blossom cardamom, peppermint mocha.",
-          },
-          {
-            title: "Interactive bars",
-            description: "Affogato dessert bar, espresso martini collab, sparkling tea lounge.",
-          },
-          {
-            title: "Styling",
-            description: "Custom signage, floral styling, monogrammed cups, bilingual baristas.",
-          },
-        ]
-      : [
-          {
-            title: "Jarabes de autor",
-            description: "Toffee de mantequilla, azúcar brûlée, azahar con cardamomo, peppermint mocha.",
-          },
-          {
-            title: "Barras interactivas",
-            description: "Bar de affogato, colaboración para espresso martini, lounge de té espumoso.",
-          },
-          {
-            title: "Ambientación",
-            description: "Señalización personalizada, flores, vasos con monograma, baristas bilingües.",
-          },
-        ];
 
   return (
     <section className="space-y-10">
@@ -94,11 +64,6 @@ export default async function MenuPage({ params }: MenuPageProps) {
         description={description}
       />
       <MenuGrid items={sections} />
-      <div className="grid gap-4 md:grid-cols-3">
-        {addOnCards.map((addon) => (
-          <Card key={addon.title} title={addon.title} description={addon.description} />
-        ))}
-      </div>
     </section>
   );
 }

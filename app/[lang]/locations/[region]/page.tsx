@@ -97,7 +97,7 @@ export default async function RegionPage({ params }: RegionPageProps) {
       <section className="space-y-6">
         <SectionHeading
           title={lang === "en" ? "Favorite venues" : "Venues favoritos"}
-          description={lang === "en" ? "A few of the Tampa Bay spaces where we regularly serve." : "Algunos de los espacios donde servimos con frecuencia."}
+          description={lang === "en" ? "A few of the Tampa Bay spaces." : "Algunos de los espacios."}
         />
         <div className="grid gap-4 md:grid-cols-3">
           {content.featuredVenues.map((venue) => (

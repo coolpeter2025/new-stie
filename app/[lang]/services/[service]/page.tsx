@@ -84,17 +84,22 @@ export default async function ServicePage({ params }: ServicePageProps) {
   }
   const dictionary = getDictionary(lang);
   const content = service.content[lang];
+  const coffeeRegex = /espresso|coffee|latte|cappuccin|cold brew|affogato|mocha|brew/i;
 
-  const iconItems = content.valueProps.map((value) => ({
-    icon: iconMap[value.icon as IconKey],
-    title: value.title,
-    description: value.description,
-  }));
+  const iconItems = content.valueProps
+    .filter((value) => ["coffee", "bean", "milk", "steam"].includes(value.icon))
+    .map((value) => ({
+      icon: iconMap[value.icon as IconKey],
+      title: value.title,
+      description: value.description,
+    }));
 
-  const addonCards = content.addOns.map((addon) => ({
-    title: addon.title,
-    description: addon.description,
-  }));
+  const addonCards = content.addOns
+    .filter((addon) => coffeeRegex.test(addon.title) || coffeeRegex.test(addon.description))
+    .map((addon) => ({
+      title: addon.title,
+      description: addon.description,
+    }));
 
   const workflowSteps = content.workflow.map((step) => ({
     title: step.title,
@@ -136,23 +141,34 @@ export default async function ServicePage({ params }: ServicePageProps) {
     </div>
   );
 
-  const renderInclusions = () => (
-    <div className="grid gap-6 md:grid-cols-2">
-      {content.inclusions.map((inclusion) => (
-        <div key={inclusion.title} className="rounded-3xl bg-white/85 p-6 shadow-sm ring-1 ring-latte/40">
-          <h3 className="font-heading text-xl text-espresso">{inclusion.title}</h3>
-          <ul className="mt-4 space-y-2 text-sm text-mocha/80">
-            {inclusion.points.map((point) => (
-              <li key={point} className="flex items-start gap-2">
-                <span className="mt-1 h-1.5 w-1.5 rounded-full bg-teal" aria-hidden />
-                <span>{point}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-    </div>
-  );
+  const renderInclusions = () => {
+    const filteredInclusions = content.inclusions
+      .map((inclusion) => ({
+        ...inclusion,
+        points: inclusion.points.filter((point) => coffeeRegex.test(point)),
+      }))
+      .filter((inclusion) => inclusion.points.length > 0);
+
+    if (filteredInclusions.length === 0) return null;
+
+    return (
+      <div className="grid gap-6 md:grid-cols-2">
+        {filteredInclusions.map((inclusion) => (
+          <div key={inclusion.title} className="rounded-3xl bg-white/85 p-6 shadow-sm ring-1 ring-latte/40">
+            <h3 className="font-heading text-xl text-espresso">{inclusion.title}</h3>
+            <ul className="mt-4 space-y-2 text-sm text-mocha/80">
+              {inclusion.points.map((point) => (
+                <li key={point} className="flex items-start gap-2">
+                  <span className="mt-1 h-1.5 w-1.5 rounded-full bg-teal" aria-hidden />
+                  <span>{point}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+    );
+  };
 
   const renderLayout = () => {
     switch (content.layoutVariant) {

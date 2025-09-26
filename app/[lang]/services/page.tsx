@@ -73,17 +73,25 @@ export default async function ServicesPage({ params }: ServicesPageProps) {
               key={serviceId}
               title={content.name}
               description={
-                <div className="space-y-3">
-                  <p>{content.hero.description}</p>
-                  <ul className="space-y-1 text-sm text-mocha/70">
-                    {content.inclusions[0]?.points.slice(0, 3).map((point) => (
-                      <li key={point} className="flex items-start gap-2">
-                        <span className="mt-1 h-1.5 w-1.5 rounded-full bg-teal" aria-hidden />
-                        <span>{point}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                (() => {
+                  const source = (content.inclusions[0]?.points ?? []) as string[];
+                  const pts = source
+                    .filter((pt) => /espresso|latte|cappuccin|cold brew|coffee|café|descafeinado/i.test(pt))
+                    .slice(0, 3);
+                  const items = pts.length > 0 ? pts : ["Espresso drinks", "Lattes & cappuccinos", "Cold brew"];
+                  return (
+                    <div className="space-y-3">
+                      <ul className="space-y-1 text-sm text-mocha/70">
+                        {items.map((point) => (
+                          <li key={point} className="flex items-start gap-2">
+                            <span className="mt-1 h-1.5 w-1.5 rounded-full bg-teal" aria-hidden />
+                            <span>{point}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  );
+                })()
               }
               footer={
                 <div className="flex items-center justify-between">
